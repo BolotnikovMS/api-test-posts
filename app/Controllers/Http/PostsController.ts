@@ -6,12 +6,11 @@ import Post from 'App/Models/Post'
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { limit, page, size, sortBy } = request.qs()
+      const { page, size, sortBy } = request.qs()
       console.log(request.qs())
 
       const posts = await Post.query()
         .if(sortBy, query => query.orderBy(sortBy[0] === '-' ? sortBy.substring(1) : sortBy, sortBy[0] === '-' ? 'desc' : 'asc'))
-        //.if(limit, query => query.limit(limit))
         // .if(page && size, query => query.paginate(page, size))
         .paginate(page ? page : 1, size ? size : -1)
 
