@@ -25,13 +25,19 @@ Route.get('/', async () => {
 })
 
 Route.group(() => {
-  Route.get('/topics', 'TopicsController.index')
-  Route.post('/topics', 'TopicsController.store')
-  Route.get('/topics/:topic(slug)', 'TopicsController.show')
-  Route.get('/topics/:topic(slug)/posts', 'TopicsController.getPosts')
-  Route.patch('/topics/:topic(slug)', 'TopicsController.update')
-  Route.delete('/topics/:topic(slug)', 'TopicsController.destroy')
+  Route.group(() => {
+    Route.get('/', 'TopicsController.index')
+    Route.post('/', 'TopicsController.store')
+    Route.get('/:topic(slug)', 'TopicsController.show')
+    Route.get('/:topic(slug)/posts', 'TopicsController.getPosts')
+    Route.patch('/:topic(slug)', 'TopicsController.update')
+    Route.delete('/:topic(slug)', 'TopicsController.destroy')
+  }).prefix('/topics')
 
-  Route.get('/posts', 'PostsController.index')
-  Route.post('/posts', 'PostsController.store')
+  Route.group(() => {
+    Route.get('/', 'PostsController.index')
+    Route.post('/', 'PostsController.store')
+    Route.get('/:post(slug)', 'PostsController.show')
+  }).prefix('/posts')
+
 }).prefix('/api/v1/')
