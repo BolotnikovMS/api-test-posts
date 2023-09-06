@@ -39,6 +39,7 @@ Route.group(() => {
     Route.post('/', 'PostsController.store')
     Route.get('/:post(slug)', 'PostsController.show')
     Route.patch('/:post(slug)', 'PostsController.update')
+    Route.delete('/:post(slug)', 'PostsController.destroy')
   }).prefix('/posts')
 
 }).prefix('/api/v1/')
