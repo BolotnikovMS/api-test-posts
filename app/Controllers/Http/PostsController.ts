@@ -111,5 +111,20 @@ export default class PostsController {
     }
   }
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({ response, params }: HttpContextContract) {
+    try {
+      const post = await Post.findBy('slug', params['post(slug)'])
+
+      if (post) {
+        await post.delete()
+
+        return response.status(204)
+      }
+
+      return response.status(404).json({ message: 'Не найдено!' })
+    } catch (error) {
+      console.log(error)
+
+    }
+  }
 }
