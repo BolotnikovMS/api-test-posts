@@ -22,6 +22,7 @@ export default class PostsController {
 
       const posts = await Post.query()
         .if(sort && order, query => query.orderBy(sort, orderBy[order]))
+        .preload('user')
         .paginate(page, size)
 
       posts.baseUrl('/api/v1/posts')
@@ -69,6 +70,8 @@ export default class PostsController {
       const post = await Post.findBy('slug', params['post(slug)'])
 
       if (post) {
+        await post.load('user')
+
         return response.status(200).json(post)
       }
 
