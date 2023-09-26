@@ -9,25 +9,25 @@ enum orderBy {
 }
 
 interface IQueryParams {
-  page: number
-  size: number
-  sort: string
-  order: orderBy
+  _page: number
+  _size: number
+  _sort: string
+  _order: orderBy
 }
 
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { page = 1, size = -1, sort, order } = request.qs() as IQueryParams
+      const { _page = 1, _size = -1, _sort, _order } = request.qs() as IQueryParams
 
       const posts = await Post.query()
-        .if(sort && order, query => query.orderBy(sort, orderBy[order]))
+        .if(_sort && _order, query => query.orderBy(_sort, orderBy[_order]))
         .preload('user')
-        .paginate(page, size)
+        .paginate(_page, _size)
 
       posts.baseUrl('/api/v1/posts')
 
-      posts.queryString({ size })
+      posts.queryString({ _size, _sort, _order })
       posts.toJSON()
 
       return response.status(200).json(posts)
