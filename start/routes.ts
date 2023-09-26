@@ -19,6 +19,7 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import { PostFactory, TopicFactory } from 'Database/factories'
 
 Route.get('/', async () => {
   return { hello: 'world' }
@@ -26,13 +27,24 @@ Route.get('/', async () => {
 
 Route.group(() => {
   Route.group(() => {
+    Route.get('/topics', async () => {
+      await TopicFactory.createMany(5)
+    })
+    Route.get('/posts', async () => {
+      await PostFactory.createMany(4)
+    })
+  }).prefix('/faker')
+
+  Route.post('/register', 'AuthController.register')
+  Route.post('/login', 'AuthController.login')
+  Route.group(() => {
     Route.get('/', 'TopicsController.index')
     Route.post('/', 'TopicsController.store')
     Route.get('/:topic(slug)', 'TopicsController.show')
     Route.get('/:topic(slug)/posts', 'TopicsController.getPosts')
     Route.patch('/:topic(slug)', 'TopicsController.update')
     Route.delete('/:topic(slug)', 'TopicsController.destroy')
-  }).prefix('/topics')
+  }).prefix('/topics').middleware('auth:api')
 
   Route.group(() => {
     Route.get('/', 'PostsController.index')
@@ -40,6 +52,6 @@ Route.group(() => {
     Route.get('/:post(slug)', 'PostsController.show')
     Route.patch('/:post(slug)', 'PostsController.update')
     Route.delete('/:post(slug)', 'PostsController.destroy')
-  }).prefix('/posts')
+  }).prefix('/posts').middleware('auth:api')
 
 }).prefix('/api/v1/')
