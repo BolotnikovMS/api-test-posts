@@ -18,7 +18,7 @@ export default class TopicsController {
 
   public async create({}: HttpContextContract) {}
 
-  public async store({ request, response }: HttpContextContract) {
+  public async store({ request, response, auth }: HttpContextContract) {
     try {
       const topicSchema = schema.create({
         name: schema.string([rules.trim(), rules.minLength(3), rules.maxLength(200), rules.escape()])
@@ -29,7 +29,7 @@ export default class TopicsController {
         maxLength: 'Максимальная длинна {{ field }} - {{ options.maxLength }} символа.',
       }
       const validatedData = await request.validate({ schema: topicSchema, messages })
-      const topic = await Topic.create({userId: 1, ...validatedData})
+      const topic = await Topic.create({userId: auth.user?.id, ...validatedData})
 
       return response.status(201).json(topic)
     } catch (error) {
