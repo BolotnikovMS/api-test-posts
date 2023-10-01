@@ -40,7 +40,7 @@ export default class PostsController {
 
   public async create({}: HttpContextContract) {}
 
-  public async store({ request, response }: HttpContextContract) {
+  public async store({ request, response, auth }: HttpContextContract) {
     try {
       const postSchema = schema.create({
         topicId: schema.number(),
@@ -55,7 +55,7 @@ export default class PostsController {
       const validatedData = await request.validate({ schema: postSchema, messages })
       console.log('validateData: ', validatedData)
 
-      const post = await Post.create({userId: 1, ...validatedData})
+      const post = await Post.create({userId: auth.user?.id, ...validatedData})
 
       return response.status(201).json(post)
     } catch (error) {
