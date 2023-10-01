@@ -18,8 +18,9 @@
 |
 */
 
+import { CommentFactory, PostFactory, TopicFactory } from 'Database/factories'
+
 import Route from '@ioc:Adonis/Core/Route'
-import { PostFactory, TopicFactory } from 'Database/factories'
 
 Route.get('/', async () => {
   return { hello: 'world' }
@@ -32,6 +33,9 @@ Route.group(() => {
     })
     Route.get('/posts', async () => {
       await PostFactory.createMany(4)
+    })
+    Route.get('/comments', async () => {
+      await CommentFactory.createMany(10)
     })
   }).prefix('/faker')
 
