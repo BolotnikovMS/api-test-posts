@@ -1,8 +1,8 @@
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 
 import { DateTime } from 'luxon'
-import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 import User from 'App/Models/User'
+import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 
 export default class Post extends BaseModel {
   @column({ isPrimary: true })
@@ -20,6 +20,11 @@ export default class Post extends BaseModel {
     strategy: 'shortId',
   })
   public slug: string
+
+  @column({
+    consume: (value: string): boolean => Boolean(value),
+  })
+  public published: boolean
 
   @column()
   public title: string

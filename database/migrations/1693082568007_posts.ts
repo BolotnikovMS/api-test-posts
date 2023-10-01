@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.integer('user_id', 10).index().unsigned()
       table.integer('topic_id', 10).index().unsigned().notNullable().references('id').inTable('topics')
       table.string('slug', 250).notNullable()
+      table.boolean('published').defaultTo(false).notNullable()
       table.string('title', 230).notNullable()
       table.text('body').notNullable()
 
