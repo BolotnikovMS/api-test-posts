@@ -7,7 +7,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.boolean('blocked').defaultTo(false)
+      table.boolean('blocked').defaultTo(false).notNullable()
       table.string('surname', 30).notNullable()
       table.string('name', 30).notNullable()
       table.string('patronymic', 30).notNullable()
