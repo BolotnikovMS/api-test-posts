@@ -1,19 +1,9 @@
 import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator'
 
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { IQueryParams } from 'App/Interfaces/QeryParams'
+import { OrderBy } from 'App/Enums/Sorted'
 import Post from 'App/Models/Post'
-
-enum orderBy {
-  'acs' = 'asc',
-  'desc' = 'desc'
-}
-
-interface IQueryParams {
-  _page: number
-  _size: number
-  _sort: string
-  _order: orderBy
-}
 
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
@@ -21,7 +11,7 @@ export default class PostsController {
       const { _page = 1, _size = -1, _sort, _order } = request.qs() as IQueryParams
 
       const posts = await Post.query()
-        .if(_sort && _order, query => query.orderBy(_sort, orderBy[_order]))
+        .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
         .preload('user')
         .paginate(_page, _size)
 
