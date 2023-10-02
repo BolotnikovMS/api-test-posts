@@ -5,9 +5,9 @@
  * file.
  */
 
+import Application from '@ioc:Adonis/Core/Application'
 import Env from '@ioc:Adonis/Core/Env'
 import { driveConfig } from '@adonisjs/core/build/config'
-import Application from '@ioc:Adonis/Core/Application'
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +78,12 @@ export default driveConfig({
       |
       */
       basePath: '/uploads',
+    },
+
+    cache: {
+      driver: 'local',
+      visibility: 'private',
+      root: './tmp', // You can change tmp by whatever you want.
     },
 
     /*
