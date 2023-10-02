@@ -51,8 +51,8 @@ export default class TopicsController {
 
   public async show({ response, params }: HttpContextContract) {
     try {
-      // console.log(await Cache.has(`topic_id_${params['topic(slug)']}`));
-      const topic = await Cache.remember(`topic_id_${params['topic(slug)']}`, 10, async () => {
+      // console.log(await Cache.get(`topic_id_${params['topic(slug)']}`));
+      const topic = await Cache.remember(`topic_id_${params['topic(slug)']}`, 15, async () => {
         console.log('Cache');
         return await Topic.findBy('slug', params['topic(slug)'])
       })
@@ -96,23 +96,30 @@ export default class TopicsController {
 
   public async update({ request, response, params }: HttpContextContract) {
     try {
-      const { name } =  request.only(['name'])
-
-      if (!name) return response.status(400).json({ message: 'Некорректные данные!' })
-
       const topic = await Topic.findBy('slug', params['topic(slug)'])
 
       if (topic) {
-        const updTopic = await topic.merge({name}).save()
+        const topicSchema = schema.create({
+          name: schema.string([rules.trim(), rules.minLength(3), rules.maxLength(200), rules.escape()])
+        })
+        const messages: CustomMessages = {
+          required: 'Поле {{ field }} является обязательным.',
+          minLength: 'Минимальная длинна {{ field }} - {{ options.minLength }} символа.',
+          maxLength: 'Максимальная длинна {{ field }} - {{ options.maxLength }} символа.',
+        }
+        const validatedData = await request.validate({ schema: topicSchema, messages })
+        const updTopic = await topic.merge(validatedData).save()
 
-        return response.status(200).json(updTopic)
+        await Cache.put(`topic_id_${params['topic(slug)']}`, updTopic)
+
+        return response.status(200).header('content-type', 'application/json').json(updTopic)
       } else {
         return response.status(404).json({ message: 'Не найдено!' })
       }
     } catch (error) {
       console.log(error)
 
-      return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
+      return response.status(400).json(error.messages.errors[0])
     }
   }
 
@@ -122,6 +129,7 @@ export default class TopicsController {
 
       if (topic) {
         await topic.delete()
+        await Cache.forget(`topic_id_${params['topic(slug)']}`)
 
         return response.status(204)
       } else {
