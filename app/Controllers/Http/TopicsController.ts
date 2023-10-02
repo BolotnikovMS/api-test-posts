@@ -2,15 +2,29 @@ import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator'
 
 import Cache from '@ioc:Adonis/Addons/Cache'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { IQueryParams } from 'App/Interfaces/QeryParams'
+import { OrderBy } from 'App/Enums/Sorted'
 import Topic from 'App/Models/Topic'
 
 export default class TopicsController {
-  public async index({ response }: HttpContextContract) {
+  public async index({ response, request }: HttpContextContract) {
     try {
+      const { _sort, _order, _page, _size } = request.qs() as IQueryParams
+
+      if (_sort && _order) {
+        console.log('All topics no cache');
+
+        const topics =  await Topic.query()
+          .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
+
+        return response.status(200).header('content-type', 'application/json').json(topics)
+      }
+
       // console.log(await Cache.has('topics'));
       const topics = await Cache.remember('topics', 10, async () => {
         console.log('Cache');
         return await Topic.query()
+          .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
       })
       // console.log('----------');
       // console.log(await Cache.get('topics'));
@@ -23,8 +37,6 @@ export default class TopicsController {
       return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
     }
   }
-
-  public async create({}: HttpContextContract) {}
 
   public async store({ request, response, auth }: HttpContextContract) {
     try {
@@ -71,7 +83,6 @@ export default class TopicsController {
 
       return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
     }
-
   }
 
   public async getPosts({ response, params }: HttpContextContract) {
@@ -91,8 +102,6 @@ export default class TopicsController {
       return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
     }
   }
-
-  public async edit({}: HttpContextContract) {}
 
   public async update({ request, response, params }: HttpContextContract) {
     try {
