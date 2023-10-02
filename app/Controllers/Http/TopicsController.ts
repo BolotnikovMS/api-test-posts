@@ -11,11 +11,14 @@ export default class TopicsController {
     try {
       const { _sort, _order, _page, _size } = request.qs() as IQueryParams
 
-      if (_sort && _order) {
-        console.log('All topics no cache');
-
+      if (_sort && _order || _page && _size) {
         const topics =  await Topic.query()
           .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
+          .paginate(_page || 1, _size || -1)
+
+        topics.baseUrl('/api/v1/topics')
+        topics.queryString({ _size: _size || -1, _sort, _order })
+        topics.toJSON()
 
         return response.status(200).header('content-type', 'application/json').json(topics)
       }
@@ -24,7 +27,6 @@ export default class TopicsController {
       const topics = await Cache.remember('topics', 10, async () => {
         console.log('Cache');
         return await Topic.query()
-          .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
       })
       // console.log('----------');
       // console.log(await Cache.get('topics'));
