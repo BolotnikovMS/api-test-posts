@@ -1,14 +1,22 @@
-import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator';
+import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator'
 
+import Cache from '@ioc:Adonis/Addons/Cache'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Topic from 'App/Models/Topic'
 
 export default class TopicsController {
   public async index({ response }: HttpContextContract) {
     try {
-      const topics = await Topic.query()
+      // console.log(await Cache.has('topics'));
+      const topics = await Cache.remember('topics', 10, async () => {
+        console.log('Cache');
+        return await Topic.query()
+      })
+      // console.log('----------');
+      // console.log(await Cache.get('topics'));
+      // console.log('----------');
 
-      return response.status(200).json(topics)
+      return response.status(200).header('content-type', 'application/json').json(topics)
     } catch (error) {
       console.log(error)
 
@@ -31,20 +39,30 @@ export default class TopicsController {
       const validatedData = await request.validate({ schema: topicSchema, messages })
       const topic = await Topic.create({userId: auth.user?.id, ...validatedData})
 
-      return response.status(201).json(topic)
+      await Cache.put('topics', topic, 1)
+
+      return response.status(201).header('content-type', 'application/json').json(topic)
     } catch (error) {
       console.log(error)
 
-      return response.status(400).json({ error })
+      return response.status(400).json(error.messages.errors[0])
     }
   }
 
   public async show({ response, params }: HttpContextContract) {
     try {
-      const topic = await Topic.findBy('slug', params['topic(slug)'])
+      // console.log(await Cache.has(`topic_id_${params['topic(slug)']}`));
+      const topic = await Cache.remember(`topic_id_${params['topic(slug)']}`, 10, async () => {
+        console.log('Cache');
+        return await Topic.findBy('slug', params['topic(slug)'])
+      })
 
       if (topic) {
-        return response.status(200).send(topic)
+        // console.log('----------');
+        // console.log(await Cache.get(`topic_id_${params['topic(slug)']}`));
+        // console.log('----------');
+
+        return response.status(200).header('content-type', 'application/json').json(topic)
       } else {
         return response.status(404).json({ message: 'Не найдено!' })
       }
