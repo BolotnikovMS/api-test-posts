@@ -2,7 +2,7 @@ import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator'
 
 import Comment from 'App/Models/Comment'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { IQueryParams } from 'App/Interfaces/QeryParams'
+import { IQueryParams } from 'App/Interfaces/QueryParams'
 import { OrderBy } from 'App/Enums/Sorted'
 import Post from 'App/Models/Post'
 
