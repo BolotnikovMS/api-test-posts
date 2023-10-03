@@ -54,6 +54,7 @@ Route.group(() => {
     Route.get('/', 'PostsController.index')
     Route.post('/', 'PostsController.store')
     Route.get('/:post(slug)', 'PostsController.show')
+    Route.get('/:post(slug)/comments', 'PostsController.getComments')
     Route.patch('/:post(slug)', 'PostsController.update')
     Route.delete('/:post(slug)', 'PostsController.destroy')
   }).prefix('/posts').middleware('auth:api')

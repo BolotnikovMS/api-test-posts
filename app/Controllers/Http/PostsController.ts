@@ -1,5 +1,6 @@
 import { CustomMessages, rules, schema } from '@ioc:Adonis/Core/Validator'
 
+import Comment from 'App/Models/Comment'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { IQueryParams } from 'App/Interfaces/QeryParams'
 import { OrderBy } from 'App/Enums/Sorted'
@@ -26,8 +27,6 @@ export default class PostsController {
       return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
     }
   }
-
-  public async create({}: HttpContextContract) {}
 
   public async store({ request, response, auth }: HttpContextContract) {
     try {
@@ -72,7 +71,31 @@ export default class PostsController {
     }
   }
 
-  public async edit({}: HttpContextContract) {}
+  public async getComments({ request, response, params }: HttpContextContract) {
+    try {
+      const post = await Post.findBy('slug', params['post(slug)'])
+
+      if (post) {
+        const { page, size } = request.qs() as IQueryParams
+        const comments = await Comment
+          .query()
+          .where('id', '=', post.id)
+          .paginate(page, size)
+
+        comments.baseUrl(`/api/v1/posts/${post.slug}/comments`)
+        comments.queryString({ size })
+        comments.toJSON()
+
+        return response.status(200).json(comments)
+      }
+
+      return response.status(404).json({ message: 'Не найдено!' })
+    } catch (error) {
+      console.log(error);
+
+      return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
+    }
+  }
 
   public async update({ request, response, params }: HttpContextContract) {
     try {
