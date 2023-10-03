@@ -9,10 +9,18 @@ import Post from 'App/Models/Post'
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { page, size, sort, order } = request.qs() as IQueryParams
+      const { page, size, sort, order, search } = request.qs() as IQueryParams
 
       const posts = await Post.query()
         .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
+        .if(search, query => {
+          query.where(queryS => {
+            queryS.whereLike('title', `%${search}%`)
+          })
+          .orWhere(queryS => {
+            queryS.whereLike('body', `%${search}%`)
+          })
+        })
         .preload('user')
         .paginate(page, size)
 

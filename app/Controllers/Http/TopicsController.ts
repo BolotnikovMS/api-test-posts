@@ -10,11 +10,12 @@ import Topic from 'App/Models/Topic'
 export default class TopicsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { sort, order, page, size } = request.qs() as IQueryParams
+      const { sort, order, page, size, search } = request.qs() as IQueryParams
 
-      if (sort && order || page && size) {
+      if (sort && order || page && size || search) {
         const topics =  await Topic.query()
           .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
+          .if(search, query => query.whereLike('name', `%${search}%`))
           .paginate(page, size)
 
         topics.baseUrl('/api/v1/topics')
