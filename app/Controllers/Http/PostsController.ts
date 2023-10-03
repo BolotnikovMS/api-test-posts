@@ -16,7 +16,6 @@ export default class PostsController {
         .paginate(page, size)
 
       posts.baseUrl('/api/v1/posts')
-
       posts.queryString({ size, sort, order })
       posts.toJSON()
 

@@ -15,10 +15,10 @@ export default class TopicsController {
       if (sort && order || page && size) {
         const topics =  await Topic.query()
           .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
-          .paginate(page || 1, size || -1)
+          .paginate(page, size)
 
         topics.baseUrl('/api/v1/topics')
-        topics.queryString({ size: size || -1, sort, order })
+        topics.queryString({ size, sort, order })
         topics.toJSON()
 
         return response.status(200).header('content-type', 'application/json').json(topics)
