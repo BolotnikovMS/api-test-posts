@@ -4,20 +4,21 @@ import Cache from '@ioc:Adonis/Addons/Cache'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { IQueryParams } from 'App/Interfaces/QeryParams'
 import { OrderBy } from 'App/Enums/Sorted'
+import Post from 'App/Models/Post'
 import Topic from 'App/Models/Topic'
 
 export default class TopicsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { _sort, _order, _page, _size } = request.qs() as IQueryParams
+      const { sort, order, page, size } = request.qs() as IQueryParams
 
-      if (_sort && _order || _page && _size) {
+      if (sort && order || page && size) {
         const topics =  await Topic.query()
-          .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
-          .paginate(_page || 1, _size || -1)
+          .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
+          .paginate(page || 1, size || -1)
 
         topics.baseUrl('/api/v1/topics')
-        topics.queryString({ _size: _size || -1, _sort, _order })
+        topics.queryString({ size: size || -1, sort, order })
         topics.toJSON()
 
         return response.status(200).header('content-type', 'application/json').json(topics)
@@ -87,14 +88,23 @@ export default class TopicsController {
     }
   }
 
-  public async getPosts({ response, params }: HttpContextContract) {
+  public async getPosts({ request, response, params }: HttpContextContract) {
     try {
       const topic = await Topic.findBy('slug', params['topic(slug)'])
 
       if (topic) {
-        await topic.load('posts')
+        const { sort, order, page, size } = request.qs() as IQueryParams
+        const posts = await Post
+          .query()
+          .where('topic_id', '=', topic.id)
+          .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
+          .paginate(page, size)
 
-        return response.status(200).json(topic.posts)
+        posts.baseUrl(`/api/v1/topics/${topic.slug}/posts`)
+        posts.queryString({ size, sort, order })
+        posts.toJSON()
+
+        return response.status(200).json(posts)
       } else {
         return response.status(404).send('Not found!')
       }
