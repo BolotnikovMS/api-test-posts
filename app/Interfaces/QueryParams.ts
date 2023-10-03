@@ -5,4 +5,5 @@ export interface IQueryParams {
   size: number
   sort: string
   order: OrderBy
+  search: string
 }
