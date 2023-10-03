@@ -8,16 +8,16 @@ import Post from 'App/Models/Post'
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { _page = 1, _size = -1, _sort, _order } = request.qs() as IQueryParams
+      const { page, size, sort, order } = request.qs() as IQueryParams
 
       const posts = await Post.query()
-        .if(_sort && _order, query => query.orderBy(_sort, OrderBy[_order]))
+        .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
         .preload('user')
-        .paginate(_page, _size)
+        .paginate(page, size)
 
       posts.baseUrl('/api/v1/posts')
 
-      posts.queryString({ _size, _sort, _order })
+      posts.queryString({ size, sort, order })
       posts.toJSON()
 
       return response.status(200).json(posts)
