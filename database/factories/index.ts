@@ -26,7 +26,7 @@ export const TopicFactory = Factory
     .define(Comment, ({ faker }) => {
       return {
         userId: faker.number.int({min: 1, max: 4}),
-        postId: 1,
+        postId: faker.number.int({min: 1, max: 20}),
         commentBody: faker.word.words({count: 8}),
       }
     })
