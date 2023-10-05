@@ -59,4 +59,10 @@ Route.group(() => {
     Route.delete('/:post(slug)', 'PostsController.destroy')
   }).prefix('/posts').middleware('auth:api')
 
+  Route.group(() => {
+    Route.get('/', 'CommentsController.index')
+    Route.post('/', 'CommentsController.store')
+    Route.patch('/:comments(slug)', 'CommentsController.update')
+    Route.delete('/:comments(slug)', 'CommentsController.destroy')
+  }).prefix('/comments').middleware('auth:api')
 }).prefix('/api/v1/')
