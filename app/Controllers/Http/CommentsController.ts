@@ -14,28 +14,6 @@ export default class CommentsController {
     }
   }
 
-  public async store({ request, response, auth }: HttpContextContract) {
-    try {
-      const commentSchema = schema.create({
-        postId: schema.number(),
-        commentBody: schema.string([rules.trim(), rules.minLength(3), rules.maxLength(200)])
-      })
-      const messages: CustomMessages = {
-        required: 'Поле {{ field }} является обязательным.',
-        minLength: 'Минимальная длинна {{ field }} - {{ options.minLength }} символа.',
-        maxLength: 'Максимальная длинна {{ field }} - {{ options.maxLength }} символа.',
-      }
-      const validatedData = await request.validate({ schema: commentSchema, messages })
-      const comment = await Comment.create({userId: auth.user?.id, ...validatedData})
-
-      return response.status(201).json(comment)
-    } catch (error) {
-      return response.status(400).json(error.messages.errors[0])
-    }
-  }
-
-  public async show({}: HttpContextContract) {}
-
   public async update({ request, response, params }: HttpContextContract) {
     try {
       const comment = await Comment.findBy('slug', params['comment(slug)'])
