@@ -55,13 +55,13 @@ Route.group(() => {
     Route.post('/', 'PostsController.store')
     Route.get('/:post(slug)', 'PostsController.show')
     Route.get('/:post(slug)/comments', 'PostsController.getComments')
+    Route.post('/:post(slug)/comments', 'PostsController.storeComment')
     Route.patch('/:post(slug)', 'PostsController.update')
     Route.delete('/:post(slug)', 'PostsController.destroy')
   }).prefix('/posts').middleware('auth:api')
 
   Route.group(() => {
     Route.get('/', 'CommentsController.index')
-    Route.post('/', 'CommentsController.store')
     Route.patch('/:comment(slug)', 'CommentsController.update')
     Route.delete('/:comment(slug)', 'CommentsController.destroy')
   }).prefix('/comments').middleware('auth:api')
