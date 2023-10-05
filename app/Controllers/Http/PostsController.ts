@@ -147,7 +147,7 @@ export default class PostsController {
       return response.status(404).json({ message: 'Не найдено!' })
     } catch (error) {
       console.log(error)
-
+      return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
     }
   }
 }
