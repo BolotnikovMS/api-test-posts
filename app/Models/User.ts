@@ -1,6 +1,9 @@
+import { BaseModel, HasMany, HasOne, beforeSave, column, hasMany, hasOne } from '@ioc:Adonis/Lucid/Orm'
+
+import Comment from 'App/Models/Comment'
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, BaseModel, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
+import Post from 'App/Models/Post'
 import Role from 'App/Models/Role'
 
 export default class User extends BaseModel {
@@ -48,4 +51,10 @@ export default class User extends BaseModel {
 
   @hasOne(() => Role)
   public role: HasOne<typeof Role>
+
+  @hasMany(() => Post)
+  public posts: HasMany<typeof Post>
+
+  @hasMany(() => Comment)
+  public comments: HasMany<typeof Comment>
 }
