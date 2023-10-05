@@ -1,5 +1,6 @@
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 
+import Comment from 'App/Models/Comment'
 import { DateTime } from 'luxon'
 import User from 'App/Models/User'
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
@@ -40,4 +41,7 @@ export default class Post extends BaseModel {
 
   @belongsTo(() => User)
   public user: BelongsTo<typeof User>
+
+  @hasMany(() => Comment)
+  public comments: HasMany<typeof Comment>
 }
