@@ -15,7 +15,7 @@ export default class Comment extends BaseModel {
 
   @column()
   @slugify({
-    fields: ['id'],
+    fields: ['postId'],
     strategy: 'shortId',
   })
   public slug: string
