@@ -87,7 +87,7 @@ export default class PostsController {
         const { page, size } = request.qs() as IQueryParams
         const comments = await Comment
           .query()
-          .where('id', '=', post.id)
+          .where('post_id', '=', post.id)
           .paginate(page, size)
 
         comments.baseUrl(`/api/v1/posts/${post.slug}/comments`)
@@ -102,6 +102,31 @@ export default class PostsController {
       console.log(error);
 
       return response.status(500).json({ message: 'Произошла ошибка при выполнении запроса!' })
+    }
+  }
+
+  public async storeComment({ request, response, params, auth }: HttpContextContract) {
+    try {
+      const post = await Post.findBy('slug', params['post(slug)'])
+
+      if (post) {
+        const commentSchema = schema.create({
+          commentBody: schema.string([rules.trim(), rules.minLength(3), rules.maxLength(200)])
+        })
+        const messages: CustomMessages = {
+          required: 'Поле {{ field }} является обязательным.',
+          minLength: 'Минимальная длинна {{ field }} - {{ options.minLength }} символа.',
+          maxLength: 'Максимальная длинна {{ field }} - {{ options.maxLength }} символа.',
+        }
+        const { commentBody } = await request.validate({ schema: commentSchema, messages })
+        const comment = await auth.user?.related('comments').create({commentBody, postId: post.id})
+
+        return response.status(201).json(comment)
+      }
+
+      return response.status(404).json({ message: 'Не найдено!' })
+    } catch (error) {
+      return response.status(400).json(error.messages.errors[0])
     }
   }
 
