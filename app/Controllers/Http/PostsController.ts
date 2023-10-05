@@ -164,6 +164,7 @@ export default class PostsController {
       const post = await Post.findBy('slug', params['post(slug)'])
 
       if (post) {
+        await post.related('comments').query().delete()
         await post.delete()
 
         return response.status(204)
