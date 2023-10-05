@@ -32,7 +32,7 @@ Route.group(() => {
       await TopicFactory.createMany(5)
     })
     Route.get('/posts', async () => {
-      await PostFactory.createMany(4)
+      await PostFactory.createMany(15)
     })
     Route.get('/comments', async () => {
       await CommentFactory.createMany(10)

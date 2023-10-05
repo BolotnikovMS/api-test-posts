@@ -14,8 +14,8 @@ export const TopicFactory = Factory
   export const PostFactory = Factory
     .define(Post, ({ faker }) => {
       return {
-        userId: 1,
-        topicId: 3,
+        userId: faker.number.int({min: 1, max: 3}),
+        topicId: faker.number.int({min: 1, max: 5}),
         title: faker.word.words({count: 3}),
         body: faker.lorem.paragraph(3)
       }
@@ -25,8 +25,8 @@ export const TopicFactory = Factory
   export const CommentFactory = Factory
     .define(Comment, ({ faker }) => {
       return {
-        userId: faker.number.int({min: 1, max: 4}),
-        postId: faker.number.int({min: 1, max: 20}),
+        userId: faker.number.int({min: 1, max: 3}),
+        postId: faker.number.int({min: 1, max: 15}),
         commentBody: faker.word.words({count: 8}),
       }
     })
