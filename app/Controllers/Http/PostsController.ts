@@ -9,7 +9,7 @@ import Post from 'App/Models/Post'
 export default class PostsController {
   public async index({ response, request }: HttpContextContract) {
     try {
-      const { page, size, sort, order, search } = request.qs() as IQueryParams
+      const { page, size = -1, sort, order, search } = request.qs() as IQueryParams
 
       const posts = await Post.query()
         .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
@@ -21,14 +21,12 @@ export default class PostsController {
             queryS.whereLike('body', `%${search}%`)
           })
         })
+        .if(page && size, query => query.paginate(page, size))
         .preload('user')
-        .paginate(page, size)
 
-      posts.baseUrl('/api/v1/posts')
-      posts.queryString({ size, sort, order })
-      posts.toJSON()
+      const total = (await Post.query().count('* as total'))[0].$extras.total
 
-      return response.status(200).json(posts)
+      return response.status(200).json({meta: {total}, data: posts})
     } catch (error) {
       console.log(error)
 
@@ -88,6 +86,7 @@ export default class PostsController {
         const comments = await Comment
           .query()
           .where('post_id', '=', post.id)
+          .preload('user')
           .paginate(page, size)
 
         comments.baseUrl(`/api/v1/posts/${post.slug}/comments`)

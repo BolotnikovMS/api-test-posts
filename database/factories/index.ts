@@ -15,7 +15,7 @@ export const TopicFactory = Factory
     .define(Post, ({ faker }) => {
       return {
         userId: faker.number.int({min: 1, max: 3}),
-        topicId: faker.number.int({min: 1, max: 5}),
+        topicId: faker.number.int({min: 3, max: 4}),
         title: faker.word.words({count: 3}),
         body: faker.lorem.paragraph(3)
       }

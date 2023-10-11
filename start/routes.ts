@@ -48,7 +48,8 @@ Route.group(() => {
     Route.get('/:topic(slug)/posts', 'TopicsController.getPosts')
     Route.patch('/:topic(slug)', 'TopicsController.update')
     Route.delete('/:topic(slug)', 'TopicsController.destroy')
-  }).prefix('/topics').middleware('auth:api')
+  }).prefix('/topics')
+  // .middleware('auth:api')
 
   Route.group(() => {
     Route.get('/', 'PostsController.index')
@@ -58,7 +59,14 @@ Route.group(() => {
     Route.post('/:post(slug)/comments', 'PostsController.storeComment')
     Route.patch('/:post(slug)', 'PostsController.update')
     Route.delete('/:post(slug)', 'PostsController.destroy')
-  }).prefix('/posts').middleware('auth:api')
+  }).prefix('/posts')
+  // .middleware('auth:api')
+
+  Route.group(() => {
+    Route.get('/', 'UsersController.index')
+    Route.get('/:id', 'UsersController.show')
+    Route.get('/:id/posts', 'UsersController.getUserPosts')
+  }).prefix('/users')
 
   Route.group(() => {
     Route.get('/', 'CommentsController.index')
