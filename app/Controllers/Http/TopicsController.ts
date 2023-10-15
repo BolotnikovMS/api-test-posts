@@ -12,29 +12,25 @@ export default class TopicsController {
     try {
       const { sort, order, page, size, search } = request.qs() as IQueryParams
 
-      if (sort && order || page && size || search) {
-        const topics =  await Topic.query()
-          .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
-          .if(search, query => query.whereLike('name', `%${search}%`))
-          .paginate(page, size)
+      const topics =  await Topic.query()
+        .if(sort && order, query => query.orderBy(sort, OrderBy[order]))
+        .if(search, query => query.whereLike('name', `%${search}%`))
+        .if(page && size, query => query.paginate(page, size))
 
-        topics.baseUrl('/api/v1/topics')
-        topics.queryString({ size, sort, order })
-        topics.toJSON()
+      const total = (await Topic.query().count('* as total'))[0].$extras.total
 
-        return response.status(200).header('content-type', 'application/json').json(topics)
-      }
+      return response.status(200).json({meta: {total}, data: topics})
 
+      // ---Caching data----
       // console.log(await Cache.has('topics'));
-      const topics = await Cache.remember('topics', 10, async () => {
-        console.log('Cache');
-        return await Topic.query()
-      })
+      // const topics = await Cache.remember('topics', 10, async () => {
+      //   console.log('Cache');
+      //   return await Topic.query()
+      // })
       // console.log('----------');
       // console.log(await Cache.get('topics'));
       // console.log('----------');
-
-      return response.status(200).header('content-type', 'application/json').json(topics)
+      // ---Caching data----
     } catch (error) {
       console.log(error)
 
@@ -61,7 +57,7 @@ export default class TopicsController {
     } catch (error) {
       console.log(error)
 
-      return response.status(400).json(error.messages.errors[0])
+      return response.status(400).json(error.messages.errors)
     }
   }
 
@@ -141,7 +137,7 @@ export default class TopicsController {
     } catch (error) {
       console.log(error)
 
-      return response.status(400).json(error.messages.errors[0])
+      return response.status(400).json(error.messages.errors)
     }
   }
 
