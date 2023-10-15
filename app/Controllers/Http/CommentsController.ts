@@ -35,7 +35,7 @@ export default class CommentsController {
 
       return response.status(404).json({ message: 'Не найдено!' })
     } catch (error) {
-      return response.status(400).json(error.messages.errors[0])
+      return response.status(400).json(error.messages.errors)
     }
   }
 

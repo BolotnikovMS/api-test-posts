@@ -43,19 +43,19 @@ export default class PostsController {
       })
       const messages: CustomMessages = {
         required: 'Поле {{ field }} является обязательным.',
-        minLength: 'Минимальная длинна {{ field }} - {{ options.minLength }} символа.',
-        maxLength: 'Максимальная длинна {{ field }} - {{ options.maxLength }} символа.',
+        minLength: 'Минимальная длина {{ field }} - {{ options.minLength }} символа.',
+        maxLength: 'Максимальная длина {{ field }} - {{ options.maxLength }} символа.',
       }
       const validatedData = await request.validate({ schema: postSchema, messages })
       console.log('validateData: ', validatedData)
 
-      const post = await Post.create({userId: auth.user?.id, ...validatedData})
+      const post = await Post.create({userId: auth.user?.id || 1, ...validatedData})
 
       return response.status(201).json(post)
     } catch (error) {
       console.log(error)
 
-      return response.status(400).json({ error })
+      return response.status(400).json(error.messages.errors)
     }
   }
 
@@ -125,7 +125,7 @@ export default class PostsController {
 
       return response.status(404).json({ message: 'Не найдено!' })
     } catch (error) {
-      return response.status(400).json(error.messages.errors[0])
+      return response.status(400).json(error.messages.errors)
     }
   }
 
@@ -154,7 +154,7 @@ export default class PostsController {
     } catch (error) {
       console.log(error)
 
-      return response.status(400).json({ error })
+      return response.status(400).json(error.messages.errors)
     }
   }
 
